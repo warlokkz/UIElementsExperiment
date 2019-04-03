@@ -1,0 +1,29 @@
+.header {
+    margin-top: 6px;
+    margin-bottom: 6px;
+    flex-direction: row;
+    background-color: rgb(75, 75, 75);
+}
+
+.header > Label {
+    --unity-item-height: 140;
+    -unity-font-style: bold;
+    font-size: 20px;
+    color: rgb(255, 255, 255);
+}
+
+.grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.row {
+    display: flex;
+    left: 50px;
+}
+
+.box {
+    height: 100px;
+    width: 100px;
+}

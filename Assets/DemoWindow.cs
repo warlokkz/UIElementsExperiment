@@ -4,68 +4,56 @@ using UnityEngine.UIElements;
 
 public class DemoWindow : EditorWindow
 {
-    private readonly Color[] _colors =
-    {
-        Color.blue,
-        Color.green,
-        Color.yellow
-    };
+    private static readonly Color[] Colors;
 
-    private readonly int kMargin = 50;
-    private readonly int kPadding = 10;
-    private readonly int kBoxSize = 100;
-    
+    private const int KMargin = 50;
+    private const int KBoxSize = 100;
+    private const string StyleSheetPath = "Assets/styles.uss";
+
+    static DemoWindow()
+    {
+        Colors = new[] {
+            Color.blue,
+            Color.green,
+            Color.yellow
+        };
+    }
+
     private void OnEnable()
     {
         var root = rootVisualElement;
-
-        var container = new VisualElement
-        {
-            style =
-            {
-                marginTop = 6,
-                marginBottom = 6,
-                flexDirection = FlexDirection.Row,
-                backgroundColor = new Color(0.3f, 0.3f, 0.3f),
-            }
-        };
-        
-        container.Add(new Label
-        {
-            text = "UI Elements",
-            style =
-            {
-                fontSize = 20,
-                unityFontStyleAndWeight = FontStyle.Bold,
-                width = 140
-            }
-        });
-        
-        root.Add(container);
-
-        var grid = new VisualElement
-        {
-            style =
-            {
-                display = DisplayStyle.Flex,
-                flexDirection = FlexDirection.Row,
-                justifyContent = Justify.SpaceBetween
-            }
-        };
-        
-        for (var i = 0; i < _colors.Length; i++)
-        {
-            grid.Add(
-                BoxColumn(i)
-            );
-        }
-        
-        root.Add(grid);
+        root.styleSheets.Add(AssetDatabase.LoadAssetAtPath<StyleSheet>(StyleSheetPath));
+        root.Add(new Header());
+        root.Add(new Grid(Colors));
     }
 
-    private VisualElement BoxColumn(int index)
+    private class Header : VisualElement
     {
-        bool flipped = index % 2 == 0;
+        public Header()
+        {
+            AddToClassList("header");
+            Add(new Label { text = "UI Elements" });
+        }
+    }
+
+    private class Grid : VisualElement
+    {
+        public Grid(Color[] colors)
+        {
+            AddToClassList("grid");
+            
+            for (var i = 0; i < colors.Length; i++)
+            {
+                Add(
+                    BoxColumn(i)
+                );
+            }
+        }
+    }
+
+    private static VisualElement BoxColumn(int index)
+    {
+        var flipped = index % 2 == 0;
         var direction = flipped ?
              FlexDirection.Column : FlexDirection.ColumnReverse;
         
@@ -75,18 +63,17 @@ public class DemoWindow : EditorWindow
             {
                 display = DisplayStyle.Flex,
                 flexDirection = direction,
-                left = kMargin,
-                top = flipped ? 0 : kMargin,
-                bottom = flipped ? kMargin : 0,
-                height = kBoxSize * _colors.Length,
-                width = kBoxSize * _colors.Length
+                top = flipped ? 0 : KMargin,
+                bottom = flipped ? KMargin : 0,
+                height = KBoxSize * Colors.Length,
+                width = KBoxSize * Colors.Length
             }
         };
         
-        for (var i = 0; i < _colors.Length; i++)
+        row.AddToClassList("row");
+        
+        foreach (var color in Colors)
         {
-            var color = _colors[i];
-            
             row.Add(
                 BoxElement(color)
             );
@@ -95,17 +82,47 @@ public class DemoWindow : EditorWindow
         return row;
     }
 
-    private VisualElement BoxElement(Color color)
+    private static VisualElement BoxElement(Color color)
     {
-        return new VisualElement
+        var box = new VisualElement
         {
             style =
             {
-                width = kBoxSize,
-                height = kBoxSize,
                 backgroundColor = color
             }
         };
+        
+        box.AddToClassList("box");
+        box.AddManipulator(new BoxMouseEventLogger());
+        
+        return box;
+    }
+
+    private class BoxMouseEventLogger : Manipulator
+    {
+        private StyleColor OriginalColor { get; set; }
+        protected override void RegisterCallbacksOnTarget()
+        {
+            target.RegisterCallback<MouseUpEvent>(OnMouseUpEvent);
+            target.RegisterCallback<MouseDownEvent>(OnMouseDownEvent);
+        }
+
+        protected override void UnregisterCallbacksFromTarget()
+        {
+            target.UnregisterCallback<MouseUpEvent>(OnMouseUpEvent);
+            target.UnregisterCallback<MouseDownEvent>(OnMouseDownEvent);
+        }
+        
+        void OnMouseUpEvent(MouseEventBase<MouseUpEvent> evt)
+        {
+            target.style.backgroundColor = OriginalColor;
+        }
+        
+        void OnMouseDownEvent(MouseEventBase<MouseDownEvent> evt)
+        {
+            OriginalColor = target.style.backgroundColor;
+            target.style.backgroundColor = new StyleColor(Color.red);
+        }
     }
     
     #region Show Window
