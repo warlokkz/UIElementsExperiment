@@ -1,0 +1,10 @@
+.dat-task {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+}
+
+.dat-task > PopupWindow {
+    flex-grow: 0.5;
+}

@@ -9,6 +9,16 @@ public class DemoWindow : EditorWindow
     private const int KMargin = 50;
     private const int KBoxSize = 100;
     private const string StyleSheetPath = "Assets/styles.uss";
+    
+    #region Show Window
+    [MenuItem("Demo/FlexBox Example")]
+    public static void ShowWindow()
+    {
+        var window = GetWindow<DemoWindow>();
+        window.minSize = new Vector2(350, 200);
+        window.titleContent = new GUIContent("Demo Window");
+    }
+    #endregion
 
     static DemoWindow()
     {
@@ -27,6 +37,7 @@ public class DemoWindow : EditorWindow
         root.Add(new Grid(Colors));
     }
 
+    #region Components
     private class Header : VisualElement
     {
         public Header()
@@ -97,41 +108,40 @@ public class DemoWindow : EditorWindow
         
         return box;
     }
+    #endregion
 
     private class BoxMouseEventLogger : Manipulator
     {
         private StyleColor OriginalColor { get; set; }
         protected override void RegisterCallbacksOnTarget()
         {
-            target.RegisterCallback<MouseUpEvent>(OnMouseUpEvent);
+            OriginalColor = target.style.backgroundColor;
+            
             target.RegisterCallback<MouseDownEvent>(OnMouseDownEvent);
+            target.RegisterCallback<MouseLeaveEvent>(OnMouseLeaveEvent);
+            target.RegisterCallback<MouseUpEvent>(OnMouseUpEvent);
         }
 
         protected override void UnregisterCallbacksFromTarget()
         {
-            target.UnregisterCallback<MouseUpEvent>(OnMouseUpEvent);
             target.UnregisterCallback<MouseDownEvent>(OnMouseDownEvent);
+            target.UnregisterCallback<MouseLeaveEvent>(OnMouseLeaveEvent);
+            target.UnregisterCallback<MouseUpEvent>(OnMouseUpEvent);
+        }
+        
+        void OnMouseDownEvent(MouseEventBase<MouseDownEvent> evt)
+        {
+            target.style.backgroundColor = new StyleColor(Color.red);
+        }
+
+        void OnMouseLeaveEvent(MouseEventBase<MouseLeaveEvent> evt)
+        {
+            target.style.backgroundColor = OriginalColor;
         }
         
         void OnMouseUpEvent(MouseEventBase<MouseUpEvent> evt)
         {
             target.style.backgroundColor = OriginalColor;
         }
-        
-        void OnMouseDownEvent(MouseEventBase<MouseDownEvent> evt)
-        {
-            OriginalColor = target.style.backgroundColor;
-            target.style.backgroundColor = new StyleColor(Color.red);
-        }
     }
-    
-    #region Show Window
-    [MenuItem("Demo/Show Window")]
-    public static void ShowWindow()
-    {
-        var window = GetWindow<DemoWindow>();
-        window.minSize = new Vector2(350, 200);
-        window.titleContent = new GUIContent("Demo Window");
-    }
-    #endregion
 }
