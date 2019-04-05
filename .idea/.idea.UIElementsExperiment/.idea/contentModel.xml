@@ -7,6 +7,8 @@
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
         <e p="DemoWindow.cs" t="Include" />
+        <e p="leader-board.uss" t="Include" />
+        <e p="LeaderBoard.cs" t="Include" />
         <e p="styles.uss" t="Include" />
         <e p="TextMesh Pro" t="Include">
           <e p="Resources" t="Include">

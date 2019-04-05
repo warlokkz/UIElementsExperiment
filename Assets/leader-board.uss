@@ -1,0 +1,21 @@
+.slab-container {
+    height: 510px;
+}
+
+.slab {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+    width: auto;
+    background-color: #D94C58;
+    flex-grow: 1;
+}
+
+.partition {
+    flex-direction: row;
+}
+
+.partition-underline {
+    border-color: #FFFFFF;
+    border-bottom-width: 2px;
+}
