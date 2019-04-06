@@ -104,6 +104,51 @@ public class Score : VisualElement
 		slab.Add(leftPartition);
 		slab.Add(rightPartition);
 		Add(slab);
+		this.AddManipulator(new ScoreManipulator(slab));
+	}
+}
+
+public class ScoreManipulator : Manipulator
+{
+	private StyleColor OriginalColor { get; set; }
+	private StyleColor SecondaryColor { get; set; }
+	private Slab Slab { get; set; }
+
+	public ScoreManipulator(Slab slab)
+	{
+		Slab = slab;
+	}
+
+	protected override void RegisterCallbacksOnTarget()
+	{
+		OriginalColor = Slab.style.backgroundColor;
+		SecondaryColor = new StyleColor(new Color(255,169,140));
+
+		target.RegisterCallback<MouseDownEvent>(OnMouseDownEvent);
+		target.RegisterCallback<MouseLeaveEvent>(OnMouseLeaveEvent);
+		target.RegisterCallback<MouseUpEvent>(OnMouseUpEvent);
+	}
+
+	protected override void UnregisterCallbacksFromTarget()
+	{
+		target.UnregisterCallback<MouseDownEvent>(OnMouseDownEvent);
+		target.UnregisterCallback<MouseLeaveEvent>(OnMouseLeaveEvent);
+		target.UnregisterCallback<MouseUpEvent>(OnMouseUpEvent);
+	}
+
+	void OnMouseDownEvent(MouseEventBase<MouseDownEvent> evt)
+	{
+		Slab.style.backgroundColor = SecondaryColor;
+	}
+
+	void OnMouseLeaveEvent(MouseEventBase<MouseLeaveEvent> evt)
+	{
+		Slab.style.backgroundColor = OriginalColor;
+	}
+
+	void OnMouseUpEvent(MouseEventBase<MouseUpEvent> evt)
+	{
+		Slab.style.backgroundColor = OriginalColor;
 	}
 }
 
